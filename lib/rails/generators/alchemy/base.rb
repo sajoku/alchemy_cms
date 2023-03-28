@@ -1,16 +1,16 @@
-require 'rails'
+require "rails"
 
 module Alchemy
   module Generators
     class Base < ::Rails::Generators::Base
-      class_option :template_engine, type: :string, aliases: '-e', desc: 'Template engine for the views. Available options are "erb", "haml", and "slim".'
+      class_option :template_engine, type: :string, aliases: "-e", desc: 'Template engine for the views. Available options are "erb", "haml", and "slim".'
 
       private
 
       def conditional_template(source, destination)
-        files = Dir.glob(destination.gsub(/\.([a-z]+)$/, '*'))
+        files = Dir.glob(destination.gsub(/\.([a-z]+)$/, "*"))
         if files.any?
-          ext = File.extname(files.first)[1..-1]
+          ext = File.extname(files.first)[1..]
 
           # If view already exists using a different template engine, change
           # source and destination file names to use that engine.
@@ -28,11 +28,12 @@ module Alchemy
         # Rails is clever enough to default this to whatever template
         # engine is configured through its generator configuration,
         # but we'll default it to erb anyway, just in case.
-        options[:template_engine] || 'erb'
+        options[:template_engine] || "erb"
       end
 
       def load_alchemy_yaml(name)
-        YAML.safe_load(ERB.new(File.read("#{Rails.root}/config/alchemy/#{name}")).result, YAML_WHITELIST_CLASSES, [], true)
+        YAML.safe_load(ERB.new(File.read("#{Rails.root}/config/alchemy/#{name}")).result,
+          permitted_classes: YAML_WHITELIST_CLASSES, aliases: true)
       rescue Errno::ENOENT
         puts "\nERROR: Could not read config/alchemy/#{name} file. Please run: `rails generate alchemy:install`"
       end

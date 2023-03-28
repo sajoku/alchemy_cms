@@ -19,7 +19,7 @@ module Alchemy
       # Returns one element definition by given name.
       #
       def definition_by_name(name)
-        definitions.detect { |d| d['name'] == name }
+        definitions.detect { |d| d["name"] == name }
       end
 
       private
@@ -28,7 +28,9 @@ module Alchemy
       #
       def read_definitions_file
         if ::File.exist?(definitions_file_path)
-          ::YAML.safe_load(ERB.new(File.read(definitions_file_path)).result, YAML_WHITELIST_CLASSES, [], true) || []
+          ::YAML.safe_load(ERB.new(File.read(definitions_file_path)).result,
+            permitted_classes: YAML_WHITELIST_CLASSES,
+            aliases: true) || []
         else
           raise LoadError, "Could not find elements.yml file! Please run `rails generate alchemy:scaffold`"
         end
@@ -37,14 +39,14 @@ module Alchemy
       # Returns the +elements.yml+ file path
       #
       def definitions_file_path
-        Rails.root.join 'config/alchemy/elements.yml'
+        Rails.root.join "config/alchemy/elements.yml"
       end
     end
 
     # The definition of this element.
     #
     def definition
-      if definition = self.class.definitions.detect { |d| d['name'] == name }
+      if definition = self.class.definitions.detect { |d| d["name"] == name }
         definition
       else
         log_warning "Could not find element definition for #{name}. Please check your elements.yml file!"
