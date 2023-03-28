@@ -29,7 +29,7 @@ module Alchemy
 
       # Alchemy default configuration
       def alchemy_config
-        read_file(File.join(File.dirname(__FILE__), '..', '..', 'config/alchemy/config.yml'))
+        read_file(File.join(File.dirname(__FILE__), "..", "..", "config/alchemy/config.yml"))
       end
 
       # Application specific configuration
@@ -46,7 +46,11 @@ module Alchemy
       # If it does not exist, or its empty, it returns an empty Hash.
       #
       def read_file(file)
-        YAML.safe_load(ERB.new(File.read(file)).result, YAML_WHITELIST_CLASSES, [], true) || {}
+        YAML.safe_load(
+          ERB.new(File.read(file)).result,
+          permitted_classes: YAML_PERMITTED_CLASSES,
+          aliases: true
+        ) || {}
       rescue Errno::ENOENT
         {}
       end
@@ -54,7 +58,7 @@ module Alchemy
       # Merges all given configs together
       #
       def merge_configs!(*config_files)
-        raise LoadError, 'No Alchemy config file found!' if config_files.map(&:blank?).all?
+        raise LoadError, "No Alchemy config file found!" if config_files.map(&:blank?).all?
         config = {}
         config_files.each { |h| config.merge!(h.stringify_keys!) }
         config
